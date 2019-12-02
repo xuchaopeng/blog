@@ -5,6 +5,7 @@ import Home from "@/views/home";
 import Archive from "@/views/archive";
 import Tags from "@/views/tags";
 import curTag from "@/views/curTag";
+import Article from '@/views/article';
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 
@@ -35,6 +36,11 @@ const routes = [
         path:"/tag/:id",
         component:curTag,
         name:'curTag'
+      },
+      {
+        path:"/a/:id",
+        component:Article,
+        name:'article'
       }
     ]
   }

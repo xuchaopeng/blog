@@ -5,16 +5,16 @@
     </h2>
     <div class="blogs" v-for="item in list" :key="item.accid">
       <figure>
-        <a href="/">
-          <img :src="item.img[0].url" alt />
-        </a>
+        <router-link :to="'/a/'+item._id">
+          <img :src="item.img" alt />
+        </router-link>
       </figure>
       <ul>
         <h3>
-          <a href="/">{{item.title}}</a>
+          <router-link :to="'/a/'+item._id">{{item.title}}</router-link>
         </h3>
         <p class="sum">
-          <a href="/">{{item.discription}}</a>
+          <router-link :to="'/a/'+item._id">{{item.discription}}</router-link>
         </p>
         <p class="ino">
           <span class="icon iconfont icon-biaoqian lf">
@@ -39,53 +39,53 @@
 </template>
 
 <script>
+import {getArticleList} from '@/api/article';
+import {mapGetters,mapMutations} from 'vuex';
+import defaultImg from '@/assets/images/tt.jpg';
 export default {
   name: 'Home',
   data() {
     return {
-      list: [
-        {
-          title: '叶子飘落的小插件分享',
-          tag: 'Javascript',
-          accid: '12312',
-          date: '2019-11-14',
-          discription:
-            '之前有博友说，喜欢首页那个叶子落的效果，今天就把那个小插件分享出去。分享地址是在github上呢，可以自己下载应用到自己的网站上。',
-          read: 20,
-          zan: 80,
-          comtimes: 20,
-          img: [
-            {
-              width: 300,
-              height: 250,
-              url:
-                'https://static.yezismile.com/data/photo/day_20170919/201709191440459223_s.jpg'
-            }
-          ]
-        },
-        {
-          title: '叶子飘落的小插件分享',
-          tag: 'Javascript',
-          accid: '123123',
-          date: '2019-11-14',
-          discription:
-            '之前有博友说，喜欢首页那个叶子落的效果，今天就把那个小插件分享出去。分享地址是在github上呢，可以自己下载应用到自己的网站上。',
-          readtimes: 20,
-          zan: 80,
-          comtimes: 20,
-          img: [
-            {
-              width: 300,
-              height: 250,
-              url:
-                'https://static.yezismile.com/data/photo/day_20170919/201709191440459223_s.jpg'
-            }
-          ]
-        }
-      ]
+      list: []
     }
   },
-  created() {}
+  created() {
+    this.showList();
+  },
+  methods:{
+    showList(){
+      getArticleList().then((res) => {
+        if(res.status == 200 && res.data.length)  {
+          this.list = this.dealData(res.data);
+          this._setArticleNumbers(this.list.length);
+        }
+      })
+    },
+    dealData(data) {
+      return data.map((item) => {
+        return {
+          title: item.title||'',
+          tag: item.category[0],
+          accid: item._id,
+          date: item.date,
+          discription:item.gist,
+          read: item._v || 1,
+          zan: item.zan || 10,
+          comtimes: item.comments && item.comments.length  || 0,
+          img: item.img || defaultImg,
+          _id:item._id
+        }
+      })
+    },
+    ...mapMutations({
+      _setArticleNumbers:'setArticleNumbers'
+    })
+  },
+  computed : {
+    ...mapGetters([
+      'articleNumbers'
+    ])
+  }
 }
 </script>
 

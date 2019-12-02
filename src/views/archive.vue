@@ -1,42 +1,76 @@
 <template>
   <div class="archives">
     <section id="posts" class="posts_content">
-      <div class="posts_item">
-        <div class="item_title">
-          <h2>2018</h2>
+      <template v-for="(curItem,key) in archiveList">
+        <div class="posts_item">
+          <div class="item_title">
+            <h2>{{key}}</h2>
+          </div>
         </div>
-      </div>
-      <div class="posts_item">
-        <div class="item_cnt">
-          <time>11-07</time>
-          <h3>
-            <a href="/detail/num/181107042307244" target="_blank">16岁女孩卵巢破裂，打开腹腔医生惊呆了！</a>
-          </h3>
+        <div class="posts_item" v-for="(item,index) in curItem">
+          <div class="item_cnt">
+            <time>{{item.date}}</time>
+            <h3>
+              <router-link :to="'/a/'+item._id">{{item.title}}</router-link>
+            </h3>
+          </div>
         </div>
-      </div>
-
-      <div class="posts_item">
-        <div class="item_title">
-          <h2>2017</h2>
-        </div>
-      </div>
-      <div class="posts_item">
-        <div class="item_cnt">
-          <time>11-07</time>
-          <h3>
-            <a href="/detail/num/181107042307244" target="_blank">16岁女孩卵巢破裂，打开腹腔医生惊呆了！</a>
-          </h3>
-        </div>
-      </div>
+      </template>
     </section>
   </div>
 </template>
 
 <script>
+import {getArticleList} from '@/api/article';
 export default {
   name: 'Archives',
   data() {
-    return {}
+    return {
+      archiveList:{
+        2019:[
+          {
+            title:'',
+            date:''
+          }
+        ]
+      }
+    }
+  },
+  created() {
+    this.getArchive();
+  },
+  methods:{
+    getArchive() {
+      getArticleList().then((res) => {
+        if(res.status == 200 && res.data.length) {
+          this.archiveList = this.dealData(res.data);
+        }
+      })
+    },
+    dealData(data) {
+      let o =  {};
+      let key = '';
+      data.reverse();
+      data.map((item) => {
+        key = item.date.slice(0,4);
+        if(!o[key]) {
+          o[key] = [
+            {
+              title:item.title,
+              date: item.date.split(' ')[0].slice(5),
+              _id:item._id
+            }
+          ]
+        } else {
+          o[key].push({
+            title:item.title,
+            date:item.date.split(' ')[0].slice(5),
+             _id:item._id
+          });
+        }
+      });
+      return o;
+    }
   }
 }
 </script>

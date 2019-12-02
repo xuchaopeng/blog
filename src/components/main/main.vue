@@ -7,9 +7,11 @@
         <Aside></Aside>
       </div>
       <div class="main">
-        <transition name="slide-fade">
-          <router-view></router-view>
-        </transition>
+        <keep-alive :include="/tag/">
+          <transition name="slide-fade">
+            <router-view></router-view>
+          </transition>
+        </keep-alive>
       </div>
     </div>
   </div>

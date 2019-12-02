@@ -5,7 +5,7 @@
         <div class="site-meta">
           <div class="site-log">
             <a class="brand" href="/">
-              <span class="site-title">慢下来，用心去看</span>
+              <span class="site-title">静觅</span>
             </a>
           </div>
           <p class="site-subtitle">Quick blog</p>
@@ -24,6 +24,7 @@
             <router-link to="/archive">
               <span>
                 <i class="icon iconfont icon-guidang"></i>归档
+                <b>{{logs}}</b>
               </span>
             </router-link>
           </li>
@@ -31,6 +32,7 @@
             <router-link to="/tags">
               <span>
                 <i class="icon iconfont icon-biaoqian"></i>标签
+                <b>{{tags}}</b>
               </span>
             </router-link>
           </li>
@@ -48,8 +50,39 @@
 </template>
 
 <script>
+import {mapGetters,mapMutations} from 'vuex';
+import {getArticleList,getTagsList} from '@/api/article';
 export default {
-  name: 'Nav'
+  name: 'Nav',
+  data() {
+    return {
+      tags:0,
+      logs:0
+    }
+  },
+  created() {
+    this.initNumbers();
+  },
+  methods:{
+    initNumbers() {
+      getArticleList().then(res => {
+        if(res.status == 200 && res.data) {
+          this.logs = res.data.length;
+          this._setArticleNumbers(this.logs)
+        }
+      });
+      getTagsList().then(res => {
+        if(res.status == 200 && res.data) {
+          this.tags = res.data.data.length;
+          this._setTagsNumbers(this.tags)
+        }
+      })
+    },
+    ...mapMutations({
+      _setArticleNumbers:'setArticleNumbers',
+      _setTagsNumbers:'setTagsNumbers'
+    })
+  }
 }
 </script>
 
@@ -128,6 +161,22 @@ export default {
                 width: 22px;
                 height: 15px;
                 font-size: 18px;
+              }
+              b {
+                font-size:14px;
+                padding: 2px 5px;
+                display: inline-block;
+                font-weight: normal;
+                line-height: 1;
+                color: #fff;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: middle;
+                background-color: #e7e7e7;
+                border-radius: 10px;
+                float: right;
+                margin: 0.35em 0 0 0;
+                text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
               }
             }
           }

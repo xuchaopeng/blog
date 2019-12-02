@@ -1,6 +1,6 @@
 <template>
-  <div class="aside">
-    <section>
+  <div class="aside" ref="aside">
+    <section class="aside_section" ref="asideSection">
       <div class="site_author">
         <img :src="logo" alt />
         <p class="site_author_name">XuchaoPeng</p>
@@ -8,21 +8,21 @@
       </div>
       <nav class="site_nav">
         <div class="site_nav_item">
-          <a href="/archive" target="_blank">
-            <span class="nav_item_count">--</span>
-            <span class="nav_item_name">Logs</span>
-          </a>
+          <router-link to="/archive">
+            <span class="nav_item_count">{{logs}}</span>
+            <span class="nav_item_name">日志</span>
+          </router-link>
         </div>
         <div class="site_nav_item">
-          <a href="/article-class" target="_blank">
-            <span class="nav_item_count">--</span>
-            <span class="nav_item_name">Fenl</span>
-          </a>
+          <router-link to="/tags">
+            <span class="nav_item_count">{{tags}}</span>
+            <span class="nav_item_name">标签</span>
+          </router-link>
         </div>
         <div class="site_nav_item">
           <a href="/about" target="_blank">
             <span class="nav_item_count">--</span>
-            <span class="nav_item_name">About</span>
+            <span class="nav_item_name">关于</span>
           </a>
         </div>
       </nav>
@@ -45,19 +45,53 @@
 </template>
 
 <script>
-import logo from '@/assets/images/tt.jpg'
+import logo from '@/assets/images/tt.jpg';
+import {mapGetters,mapMutations} from 'vuex';
 export default {
   name: 'Aside',
   data() {
     return {
-      logo
+      logo,
+      logs:0,
+      tags:0
     }
   },
-  components: {}
+  created() {},
+  mounted(){
+    setTimeout(() => {
+      this.initScroll();
+    },500)
+  },
+  methods:{
+    initScroll() {
+      window.addEventListener('scroll',() => {
+        const react = this.$refs.aside.getBoundingClientRect();
+        if(react.top <= 0) {
+          this.$refs.asideSection.classList.add('scroll_fixed')
+        } else {
+          this.$refs.asideSection.classList.remove('scroll_fixed')
+        }
+      })
+    }
+  },
+  computed:{
+    ...mapGetters([
+      'tagsNumbers',
+      'articleNumbers'
+    ])
+  },
+  watch: {
+    tagsNumbers(num) {
+      this.tags = num
+    },
+    articleNumbers(num) {
+      this.logs = num
+    }
+  }
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .aside {
   margin-top: 15px;
   background-color: #fff;
@@ -69,7 +103,6 @@ export default {
   box-shadow: initial;
   border-radius: initial;
   position: relative;
-  padding: 20px 10px;
   text-align: center;
   .site_author {
     .site_author_dis {
@@ -128,6 +161,17 @@ export default {
         background: #eee;
       }
     }
+  }
+  .aside_section {
+    background-color: #fff;
+    width:100%;
+    padding:20px 10px;
+    width: 200px;
+    height: 342px;
+  }
+  .scroll_fixed {
+    position: fixed;
+    top:0;
   }
 }
 </style>

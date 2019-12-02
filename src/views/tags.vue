@@ -1,30 +1,64 @@
 <template>
   <div class="tag">
     <h2>tag</h2>
-    <p class="cloud">目前共计15个标签</p>
+    <p class="cloud">目前共计{{tagNumber}}个标签</p>
     <div class="cloud-tag">
-      <router-link class="cls3" to="/tag/CSS3">CSS3</router-link>
-      <router-link class="cls2" to="/tag/FilePond">FilePond</router-link>
-      <router-link class="cls1" to="/tag/Git">Git</router-link>
-      <router-link class="cls3" to="/tag/HTML5">HTML5</router-link>
-      <router-link class="cls1" to="/tag/Hexo">Hexo</router-link>
-      <router-link class="cls2" to="/tag/Music">Music</router-link>
-      <router-link class="cls1" to="/tag/Vue">Vue</router-link>
-      <router-link class="cls3" to="/tag/Web存储">Web存储</router-link>
-      <router-link class="cls1" to="/tag/javascript">javascript</router-link>
-      <router-link class="cls1" to="/tag/webpack">webpack</router-link>
-      <router-link class="cls2" to="/tag/性能优化">性能优化</router-link>
-      <router-link class="cls1" to="/tag/旅游">旅游</router-link>
-      <router-link class="cls3" to="/tag/生活">生活</router-link>
-      <router-link class="cls1" to="/tag/算法">算法</router-link>
-      <router-link class="cls1" to="/tag/设计模式">设计模式</router-link>
+      <template v-for="(item,idx) in list">
+        <router-link :class="item.class" :to="item.to">{{item.name}}</router-link>
+      </template>
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex';
+import {getTagsList} from '@/api/article';
 export default {
-  name: 'tag'
+  name: 'tag',
+  data() {
+    return {
+      tagNumber:0,
+      list:[]
+    }
+  },
+  created(){
+    this.getTagsData();
+  },
+  mounted() {},
+  methods:{
+    getTagsData() {
+      if(this.tagsList && this.tagsList.length > 0) {
+        this.list = this.dealData(this.tagsList);
+        this.tagNumber = this.list.length;
+      } else {
+        getTagsList().then(res => {
+          if(res.status == 200) {
+            this._setTagsList(res.data.data);
+            this.list = this.dealData(res.data.data);
+            this.tagNumber = this.list.length;
+          }
+        })
+      }
+    },
+    dealData(data) {
+      return data.map(item => {
+        let ran = parseInt(Math.random()*3)
+        return {
+          name:item.name,
+          to:'/tag/'+item.name,
+          class:ran == 1 ? 'cls2' : ran == 2 ? 'cls2' : 'cls3'
+        }
+      })
+    },
+    ...mapMutations({
+      _setTagsList:'setTagsList'
+    })
+  },
+  computed:{
+    ...mapGetters([
+      'tagsList'
+    ])
+  }
 }
 </script>
 

@@ -6,11 +6,11 @@
           <h2>{{currentTag}}</h2>
         </div>
       </div>
-      <div class="posts_item">
+      <div class="posts_item" v-for="(item,index) in currentTagList">
         <div class="item_cnt">
-          <time>11-07</time>
+          <time>{{item.date.split(' ')[0].slice(5)}}</time>
           <h3>
-            <a href="/detail/num/181107042307244" target="_blank">打开腹腔医生惊呆了！</a>
+            <router-link :to="'/a/'+item._id">{{item.title}}</router-link>
           </h3>
         </div>
       </div>
@@ -19,16 +19,47 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex';
+import {getTagsList} from '@/api/article';
 export default {
   name: 'curTag',
   data() {
     return {
-      currentTag: ''
+      currentTag: '',
+      currentTagList:[]
     }
   },
-  created() {},
+  created() {
+
+  },
   mounted() {
-    this.currentTag = this.$route.params.id
+    this.currentTag = this.$route.params.id;
+    this.getData();
+  },
+  computed:{
+    ...mapGetters(['tagsList'])
+  },
+  methods:{
+    ...mapMutations({
+      _setTagsList:'setTagsList'
+    }),
+    getData() {
+      if(this.tagsList && this.tagsList.length) {
+        this.currentTagList = this.dealData(this.tagsList);
+      } else {
+        getTagsList().then(res => {
+          if(res.status == 200) {
+            this._setTagsList(res.data.data);
+            this.currentTagList = this.dealData(res.data.data);
+          }
+        })
+      }
+    },
+    dealData(data) {
+      const tag = this.currentTag;
+      const currentTags = data.filter(item => item.name == tag);
+      return currentTags[0].articles || [];
+    }
   }
 }
 </script>
