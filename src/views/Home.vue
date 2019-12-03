@@ -23,7 +23,7 @@
           <span class="icon iconfont icon-shijian lf">
             <i>{{item.date}}</i>
           </span>
-          <span class="icon iconfont icon-zan rg">
+          <span class="icon iconfont icon-nice rg">
             <i>{{item.zan}}</i>
           </span>
           <span class="icon iconfont icon-yuedu rg">
@@ -69,8 +69,8 @@ export default {
           accid: item._id,
           date: item.date,
           discription:item.gist,
-          read: item._v || 1,
-          zan: item.zan || 10,
+          read: item.read || 1,
+          zan: item.zan || 0,
           comtimes: item.comments && item.comments.length  || 0,
           img: item.img || defaultImg,
           _id:item._id

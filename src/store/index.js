@@ -8,7 +8,8 @@ export default new Vuex.Store({
     tagsList: [],
     tagsNumbers:0,
     articleNumbers:0,
-    currentNav:'home'
+    currentNav:'home',
+    isSignIn:0 //0未登录，1admin，2游客
   },
   mutations: {
     setTagsList(state,tagsList) {
@@ -19,6 +20,9 @@ export default new Vuex.Store({
     },
     setArticleNumbers(state,numbers) {
       state.articleNumbers = numbers;
+    },
+    changeIsSignIn(state,n) {
+      state.isSignIn = n
     }
   },
   actions: {},
@@ -26,6 +30,7 @@ export default new Vuex.Store({
   getters: {
     tagsList: state => state.tagsList,
     tagsNumbers:state => state.tagsNumbers,
-    articleNumbers:state => state.articleNumbers
+    articleNumbers:state => state.articleNumbers,
+    isSignIn: state => state.isSignIn
   }
 });

@@ -2,9 +2,10 @@
   <div class="aside" ref="aside">
     <section class="aside_section" ref="asideSection">
       <div class="site_author">
-        <img :src="logo" alt />
-        <p class="site_author_name">XuchaoPeng</p>
-        <p class="site_author_dis">胡编一通，乱写一气</p>
+        <img :src="logo" alt @click="login" />
+        <p class="site_author_name">{{user.name}}</p>
+        <p class="site_author_dis">{{user.nickname}}</p>
+        <Login v-if="needLogin" type="1" @closeLogin="closeLogin"></Login>
       </div>
       <nav class="site_nav">
         <div class="site_nav_item">
@@ -45,18 +46,28 @@
 </template>
 
 <script>
-import logo from '@/assets/images/tt.jpg';
+//胡编一通，乱写一气
+import logo from '@/assets/images/default_avatar.gif';
 import {mapGetters,mapMutations} from 'vuex';
+import Login from '@/components/login/login.vue';
+import {checkUser} from '@/api/admin';
 export default {
   name: 'Aside',
   data() {
     return {
       logo,
       logs:0,
-      tags:0
+      tags:0,
+      needLogin:false,
+      user:{
+        name:'游客',
+        nickname:'胡编一通'
+      }
     }
   },
-  created() {},
+  created() {
+    this.checkLogin();
+  },
   mounted(){
     setTimeout(() => {
       this.initScroll();
@@ -72,12 +83,39 @@ export default {
           this.$refs.asideSection.classList.remove('scroll_fixed')
         }
       })
-    }
+    },
+    checkLogin(){
+      const token = localStorage.getItem('token');
+      const usename = localStorage.getItem('user_name');
+      if(token && usename) {
+        checkUser({
+          name:usename,
+          token
+        }).then(res => {
+          if(res.status == 200) {
+            const data = res.data
+            this.user.nickname = data.nickName;
+            this.user.name = data.name;
+            this._changeIsSignIn(2);
+          }
+        })
+      }
+    },
+    login() {
+      if(!this.isSignIn && !this.needLogin) this.needLogin = true;
+    },
+    closeLogin() {
+      if(this.needLogin) this.needLogin = false;
+    },
+    ...mapMutations({
+      _changeIsSignIn:'changeIsSignIn'
+    })
   },
   computed:{
     ...mapGetters([
       'tagsNumbers',
-      'articleNumbers'
+      'articleNumbers',
+      'isSignIn'
     ])
   },
   watch: {
@@ -86,7 +124,13 @@ export default {
     },
     articleNumbers(num) {
       this.logs = num
+    },
+    isSignIn(type) {
+      if(type !== 0) this.checkLogin();
     }
+  },
+  components:{
+    Login
   }
 }
 </script>

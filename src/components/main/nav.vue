@@ -16,7 +16,7 @@
           <li class="menu-item">
             <router-link to="/">
               <span>
-                <i class="icon iconfont icon-liuliangyunpingtaitubiao02"></i>首页
+                <i class="icon iconfont icon-shouye"></i>首页
               </span>
             </router-link>
           </li>
@@ -39,7 +39,7 @@
           <li class="menu-item">
             <router-link to="/">
               <span>
-                <i class="icon iconfont icon-sousuo"></i>搜索
+                <i class="icon iconfont icon-icon_sousuo_x"></i>搜索
               </span>
             </router-link>
           </li>
