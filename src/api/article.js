@@ -20,3 +20,14 @@ export const getArticleDetail = artilceID => {
     url:'/api/articleDetail/'+artilceID
   })
 }
+
+export const getArticleZan = param => {
+  let id = param.id;
+  return axios.request({
+    data:{
+      _id:id
+    },
+    method:'post',
+    url:'/api/article/zan'
+  })
+}

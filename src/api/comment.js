@@ -45,3 +45,22 @@ export const replycomment = param => {
     }
   });
 };
+
+export const zancomment = param => {
+  let {
+    _id,
+    id,
+    from_uid,
+    from_uname,
+  } = param;
+  return axios.request({
+    url: "/api/comment/zan",
+    method: "post",
+    data: {
+      _id,
+      id,
+      from_uid,
+      from_uname
+    }
+  });
+}

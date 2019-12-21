@@ -29,9 +29,9 @@
           <span class="icon iconfont icon-yuedu rg">
             <i>浏览({{item.read}})</i>
           </span>
-          <a class="icon iconfont icon-biaoqing rg">
+          <span class="icon iconfont icon-biaoqing rg">
             <i>评论({{item.comtimes}})</i>
-          </a>
+          </span>
         </p>
       </ul>
     </div>
@@ -71,7 +71,7 @@ export default {
           discription:item.gist,
           read: item.read || 1,
           zan: item.zan || 0,
-          comtimes: item.comments && item.comments.length  || 0,
+          comtimes: item.comments && item.comments[0]  || 0,
           img: item.img || defaultImg,
           _id:item._id
         }
@@ -163,7 +163,6 @@ export default {
           }
         }
         .icon-biaoqing {
-          cursor: pointer;
           &:hover i {
             text-decoration: underline;
           }
@@ -175,6 +174,11 @@ export default {
           }
         }
       }
+    }
+  }
+  .ino {
+    .icon-nice {
+      cursor: pointer;
     }
   }
 }

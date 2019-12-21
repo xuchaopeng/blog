@@ -8,6 +8,11 @@
       <span class="ml5 mr5">|</span>
       <span class="icon iconfont icon-yuedu"></span>
       <span class="pl5">阅读次数 : {{read}}</span>
+      <span class="ml5 mr5">|</span>
+      <a class="zan pl5" @click="addzan">
+        <i class="icon iconfont icon-nice rg"></i>
+        {{zan}}
+      </a>
     </div>
     <div class="content">
       <mavon-editor
@@ -37,12 +42,13 @@
       </div>
       <div class="cmt-top">
         <span>
-          <b>{{comments.length}}</b>条评论
+          全部评论
+          <b>{{comments.length}}</b>条
         </span>
       </div>
       <div class="cmt-con">
         <ul>
-          <li class="cmt-comment" v-for="item in comments">
+          <li class="cmt-comment" v-for="(comment, index) in comments" :key="comment.id">
             <div class="cmt-item">
               <div class="cmt-avatar">
                 <a>
@@ -51,74 +57,24 @@
               </div>
               <div class="cmt-body">
                 <div class="cmt-header">
-                  <a>{{item.from_uid}}</a>
+                  <a>{{comment.from_uid || '游客'}}</a>
                 </div>
-                <p>{{item.content}}</p>
+                <p>{{comment.content}}</p>
                 <div class="cmt-footer">
-                  <span class="times">{{item.date}}</span>
-                  <a @click="getReply">
+                  <span class="times">{{comment.date}}</span>
+                  <a @click="changeTextStatus(index,true,comment.from_uid,comment.from_uname)">
                     <span class="cmt-reply iconfont icon-icon_reply"></span>
                     回复
                   </a>
-                  <a @click="getZan">
+                  <a @click="getZan(comment.id,comment.to_uid,comment.to_uname)">
                     <span class="cmt-like iconfont icon-xihuan"></span>
-                    顶（{{item.zan || 0}}）
+                    顶（{{comment.zan || 0}}）
                   </a>
                 </div>
               </div>
             </div>
-          </li>
-          <!-- <li class="cmt-comment">
-            <div class="cmt-item">
-              <div class="cmt-avatar">
-                <a href="/">
-                  <img :src="avatar" alt />
-                </a>
-              </div>
-              <div class="cmt-body">
-                <div class="cmt-header">
-                  <a>上海网友</a>
-                </div>
-                <p>哈哈</p>
-                <div class="cmt-footer">
-                  <span class="times">12月1日</span>
-                  <a href="/">
-                    <span class="cmt-reply iconfont icon-icon_reply"></span>
-                    回复
-                  </a>
-                  <a href="/">
-                    <span class="cmt-like iconfont icon-xihuan"></span>顶（1）
-                  </a>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li class="cmt-comment">
-            <div class="cmt-item">
-              <div class="cmt-avatar">
-                <a href="/">
-                  <img :src="avatar" alt />
-                </a>
-              </div>
-              <div class="cmt-body">
-                <div class="cmt-header">
-                  <a>上海网友</a>
-                </div>
-                <p>哈哈</p>
-                <div class="cmt-footer">
-                  <span class="times">12月1日</span>
-                  <a href="/">
-                    <span class="cmt-reply iconfont icon-icon_reply"></span>
-                    回复
-                  </a>
-                  <a href="/">
-                    <span class="cmt-like iconfont icon-xihuan"></span>顶（1）
-                  </a>
-                </div>
-              </div>
-            </div>
-            <ul class="cmt-children">
-              <li class="cmt-comment">
+            <ul class="cmt-children" v-if="comment.child.length>0">
+              <li class="cmt-comment" v-for="(reply,index2) in comment.child">
                 <div class="cmt-item">
                   <div class="cmt-avatar">
                     <a href="/">
@@ -127,104 +83,44 @@
                   </div>
                   <div class="cmt-body">
                     <div class="cmt-header">
-                      <a>上海网友</a>
+                      <a>{{reply.from_uid || '游客'}}</a>
                     </div>
-                    <p>哈哈</p>
+                    <p>{{reply.content}}</p>
                     <div class="cmt-footer">
-                      <span class="times">12月1日</span>
-                      <a href="/">
+                      <span class="times">{{reply.date}}</span>
+                      <!-- <a @click="changeTextStatus(index,true,replay.from_uid,replay.from_uname)">
                         <span class="cmt-reply iconfont icon-icon_reply"></span>
                         回复
-                      </a>
-                      <a href="/">
-                        <span class="cmt-like iconfont icon-xihuan"></span>顶（1）
-                      </a>
+                      </a>-->
+                      <!-- <a href="/">
+                        <span class="cmt-like iconfont icon-xihuan"></span>
+                        顶（{{reply.zan || 0}}）
+                      </a>-->
                     </div>
                   </div>
                 </div>
               </li>
             </ul>
-          </li>
-
-          <li class="cmt-comment">
-            <div class="cmt-item">
-              <div class="cmt-avatar">
-                <a href="/">
+            <div class="child-wrapper" v-if="comment.open">
+              <div class="avatar" @click="login">
+                <a>
                   <img :src="avatar" alt />
                 </a>
+                <Login v-if="needLogin" type="1" @closeLogin="closeLogin"></Login>
               </div>
-              <div class="cmt-body">
-                <div class="cmt-header">
-                  <a>上海网友</a>
-                </div>
-                <p>哈哈</p>
-                <div class="cmt-footer">
-                  <span class="times">12月1日</span>
-                  <a href="/">
-                    <span class="cmt-reply iconfont icon-icon_reply"></span>
-                    回复
-                  </a>
-                  <a href="/">
-                    <span class="cmt-like iconfont icon-xihuan"></span>顶（1）
-                  </a>
-                </div>
+              <textarea
+                v-model.lazy="textArea[index]"
+                :placeholder="`回复${comment.from_uid || '游客'}：`"
+              ></textarea>
+              <div class="down">
+                <a
+                  class="post-button"
+                  @click="replysubmit(comment.id,comment.to_uid,comment.to_uname,textArea[index])"
+                >发表</a>
+                <a href="javascript:;" @click="changeTextStatus(index,false)" class="takeUp">收起↑</a>
               </div>
             </div>
-            <ul class="cmt-children">
-              <li class="cmt-comment">
-                <div class="cmt-item">
-                  <div class="cmt-avatar">
-                    <a href="/">
-                      <img :src="avatar" alt />
-                    </a>
-                  </div>
-                  <div class="cmt-body">
-                    <div class="cmt-header">
-                      <a>上海网友</a>
-                    </div>
-                    <p>哈哈</p>
-                    <div class="cmt-footer">
-                      <span class="times">12月1日</span>
-                      <a href="/">
-                        <span class="cmt-reply iconfont icon-icon_reply"></span>
-                        回复
-                      </a>
-                      <a href="/">
-                        <span class="cmt-like iconfont icon-xihuan"></span>顶（1）
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                <ul class="cmt-children">
-                  <li class="cmt-comment">
-                    <div class="cmt-item">
-                      <div class="cmt-avatar">
-                        <a href="/">
-                          <img :src="avatar" alt />
-                        </a>
-                      </div>
-                      <div class="cmt-body">
-                        <div class="cmt-header">
-                          <a>上海网友</a>
-                        </div>
-                        <p>哈哈</p>
-                        <div class="cmt-footer">
-                          <span class="times">12月1日</span>
-                          <a href="/">
-                            <span class="cmt-reply iconfont icon-icon_reply"></span>
-                            回复
-                          </a>
-                          <a href="/">
-                            <span class="cmt-like iconfont icon-xihuan"></span>顶（1）
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </li>-->
+          </li>
         </ul>
       </div>
     </div>
@@ -235,8 +131,8 @@
 import avatar from '@/assets/images/default_avatar.gif';
 import Login from '@/components/login/login.vue';
 import {mapGetters,mapMutations} from 'vuex';
-import {getArticleDetail} from  '@/api/article';
-import {newcomment,replycomment} from '@/api/comment';
+import {getArticleDetail,getArticleZan} from  '@/api/article';
+import {newcomment,replycomment,zancomment} from '@/api/comment';
 import {checkUser} from '@/api/admin';
 import {getDate,Guid} from '@/api/utils'
 export default {
@@ -246,6 +142,7 @@ export default {
             title:'',
             date:'',
             read:0,
+            zan:0,
             content:'',
             needLogin:false,
             comments:[],
@@ -272,6 +169,25 @@ export default {
             this.read = article.read;
             this.title = article.title;
             this.content = article.content;
+            this.zan = article.zan || 0;
+            this.comments = article.comments.reverse();
+          }
+        })
+      },
+      //文章点赞
+      addzan(){
+        let param = {id:this.articleId};
+        getArticleZan(param).then(res => {
+          if(res.status == 200 && res.data && res.data.status == 1){
+            this.zan += 1;
+          }
+        });
+      },
+      //更新当前文章
+      upDateComment() {
+        getArticleDetail(this.articleId).then(res => {
+          if(res.status == 200) {
+            const article = res.data;
             this.comments = article.comments.reverse();
           }
         })
@@ -285,7 +201,7 @@ export default {
             token
           }).then(res => {
             if(res.status == 200) {
-              const data = res.data
+              const data = res.data;
               this.user.nickname = data.nickName;
               this.user.name = data.name;
               this.user.type = data.type;
@@ -300,6 +216,7 @@ export default {
       login() {
         if(!this.isSignIn && !this.needLogin) this.needLogin = true;
       },
+      //文章的第一级评论
       replycom(){
         //优先检测是否登录
         if(!this.isSignIn && !this.needLogin)  {
@@ -320,22 +237,66 @@ export default {
         }).then(res => {
           if(res.status == 200 && res.data && res.data.status == 1) {
             //评论发表成功
-
+            this.upDateComment();
           }
 
         })
       },
-      getReply(){
-        //回复评论
+      //文章的第二级评论
+      replysubmit(id, to_uid, to_uname, textArea){
+        if(!textArea) return;
+        let param = {
+          _id: this.articleId, //文章id
+          id: id, //评论id
+          from_uid: this.user.name,
+          from_uname: this.user.nickname,
+          avatar: this.avatar,
+          to_uid: to_uid,
+          to_uname: to_uname,
+          content: textArea,
+          date: getDate()
+        };
+        replycomment(param).then(res => {
+          if(res.status == 200 && res.data && res.data.status == 1) {
+            //评论回复成功
+            this.upDateComment();
+          }
+        })
       },
-      getZan(){
+      changeTextStatus(index, open, to_uid, to_uname){
+        let comments = this.comments;
+        if (to_uid) {
+          comments[index]["to_uid"] = to_uid;
+          comments[index]["to_uname"] = to_uname;
+        }
+        comments[index]["open"] = open;
+        const item = comments[index];
+        comments.splice(index,1,item);
+      },
+      getZan(id, to_uid, to_uname){
         //点赞
+        let param = {
+          _id:this.articleId,
+          id:id,
+          to_uid: to_uid,
+          to_uname: to_uname
+        }
+        zancomment(param).then(res => {
+          if(res.status == 200 && res.data && res.data.status == 1) {
+            this.upDateComment();
+          }
+        })
       },
       ...mapMutations({
         _changeIsSignIn:'changeIsSignIn'
       })
     },
     computed:{
+      textArea() {
+        return this.comments.map(e => {
+          return null;
+        });
+      },
       ...mapGetters([
         'isSignIn'
       ])
@@ -359,6 +320,9 @@ export default {
       text-align: center;
       font-weight: 400;
       font-size:20px;
+    }
+    .zan {
+      cursor: pointer;
     }
     .meta {
         margin: 3px 0 60px 0;
@@ -549,6 +513,7 @@ export default {
                   padding: 0 6px 0 0;
                   font-size: 12px;
                   color: #999;
+                  cursor: pointer;
               }
               .cmt-reply {
                   width: 18px;
@@ -563,6 +528,70 @@ export default {
           margin-left: 38px;
           padding: 0;
           border-bottom:none;
+        }
+      }
+      .child-wrapper {
+        margin-left: 90px;
+        padding:0;
+        padding-bottom:10px;
+        position: relative;
+        .avatar {
+           position: absolute;
+           left:-60px;
+           top:0;
+          height:50px;
+          width:50px;
+          img {
+            width: 48px;
+            height: 48px;
+            padding: 2px;
+            border: 1px solid #eee;
+          }
+        }
+        textarea {
+          display: block;
+          box-shadow: none;
+          -webkit-appearance: none;
+          overflow: auto;
+          padding: 10px;
+          height: 75px;
+          margin: 0;
+          resize: none;
+          color: #999;
+          width: 100%;
+          box-sizing:border-box;
+          border: solid 1px #ccc;
+          outline: 0;
+          -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+          transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+          border-top-left-radius: 3px;
+          border-top-right-radius: 3px;
+          font-size: 13px;
+          color: #aaa;
+        }
+        .down {
+          text-align: right;
+          position: relative;
+          border: solid 1px #ccc;
+          border-top: none;
+          border-bottom-left-radius: 3px;
+          border-bottom-right-radius: 3px;
+          height:30px;
+          line-height: 30px;
+          a {
+            float:right;
+            height:100%;
+            width:100px;
+            cursor: pointer;
+            text-align: center;
+            text-shadow: 0 1px 0 #fff;
+            color: #555;
+            font-size: 14px;
+            font-weight: 700;
+            border-left: 1px solid #ccc;
+            border-bottom-right-radius: 3px;
+            background-color: #e6e6e6;
+          }
         }
       }
     }
