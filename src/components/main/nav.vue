@@ -5,10 +5,10 @@
         <div class="site-meta">
           <div class="site-log">
             <a class="brand" href="/">
-              <span class="site-title">静觅</span>
+              <span class="site-title">博客</span>
             </a>
           </div>
-          <p class="site-subtitle">Quick blog</p>
+          <p class="site-subtitle">后院里的竹子</p>
         </div>
       </div>
       <nav class="site-nav">

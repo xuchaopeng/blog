@@ -2,7 +2,7 @@ import HttpRequest from "./axios";
 const config = {
   baseUrl: {
     dev: "http://localhost:8090",
-    pro: "http://localhost:8090"
+    pro: "//xcpeng.cn"
   }
 };
 const baseUrl =

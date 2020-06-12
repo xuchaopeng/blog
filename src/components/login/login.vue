@@ -99,14 +99,12 @@ export default {
                 nickname:this.nickname,
                 password:this.password
             }).then(res => {
-                console.log(res,'login')
                 if(res.status == 200 && res.data && res.data.status == 1) {
                     this.loginSuccess(res.data);
                 } else {
                     this.prom('用户名或密码错误');
                 }
             })
-
         },
         regist() {
             const isLegal = this.isLegal();
@@ -118,7 +116,6 @@ export default {
                 email:this.this,
                 personPage:this.personPage,
             }).then(res => {
-                console.log(res,'regist')
                 if(res.status == 200 && res.data && res.data.status == 1){
                     this.isRegist = false;
                 }
